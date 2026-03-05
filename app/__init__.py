@@ -5,12 +5,19 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 def create_app():
-    # Definimos las rutas base para que Flask sepa dónde encontrar todo
+    # Definimos la ruta base del proyecto
     base_dir = os.path.abspath(os.path.dirname(__file__))
+    
+    # Definimos las rutas específicas para plantillas y archivos estáticos
     template_dir = os.path.join(base_dir, 'views', 'templates')
+    static_dir = os.path.join(base_dir, 'views', 'static')
     
-    app = Flask(__name__, template_folder=template_dir)
+    # Inicializamos Flask indicando dónde buscar estos recursos
+    app = Flask(__name__, 
+                template_folder=template_dir, 
+                static_folder=static_dir)
     
+    # Configuración de base de datos
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///blog.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
