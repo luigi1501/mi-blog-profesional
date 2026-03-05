@@ -18,7 +18,15 @@ def create_app():
                 static_folder=static_dir)
     
     # Configuración de base de datos
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///blog.db')
+    db_uri = os.environ.get('DATABASE_URL')
+    
+    if not db_uri:
+        raise ValueError("Error: La variable DATABASE_URL no está configurada en el entorno.")
+    
+    if db_uri.startswith("postgres://"):
+        db_uri = db_uri.replace("postgres://", "postgresql://", 1)
+        
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     db.init_app(app)
