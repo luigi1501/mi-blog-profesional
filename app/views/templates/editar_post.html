@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Pensamiento</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23a855f7;stop-opacity:1%22 /></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23grad)%22 /><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22>📓</text></svg>">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark mb-5 shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">📓 Mi Blog Personal</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card card-post shadow-lg p-4">
+                    <h2 class="text-center mb-4 post-title">📝 Editar mi Pensamiento</h2>
+                    
+                    <form action="{{ url_for('blog.editar', id=post.id) }}" method="POST">
+                        <div class="mb-4">
+                            <label for="titulo" class="form-label fw-bold">Título del Post</label>
+                            <input type="text" name="titulo" id="titulo" class="form-control form-control-lg" 
+                                   value="{{ post.titulo }}" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="contenido" class="form-label fw-bold">¿Qué quieres cambiar?</label>
+                            <textarea name="contenido" id="contenido" rows="6" class="form-control" 
+                                      required>{{ post.contenido }}</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between gap-3">
+                            <a href="/" class="btn btn-outline-secondary w-50">Cancelar</a>
+                            <button type="submit" class="btn btn-primary btn-nuevo w-50 shadow">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

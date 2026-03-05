@@ -1,0 +1,117 @@
+/* --- CONFIGURACIÓN DE FONDO --- */
+:root {
+    --primary: #6366f1;
+    --accent: #a855f7;
+    --bg: #f1f5f9;
+    --dark: #1e293b;
+}
+
+body {
+    background-color: var(--bg);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* CENTRADO VERTICAL ABSOLUTO */
+    margin: 0;
+}
+
+/* --- CONTENEDOR Y TARJETA --- */
+.container {
+    width: 100%;
+    max-width: 650px;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+/* --- ENCABEZADO CON DEGRADADO --- */
+.card-header {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    padding: 30px;
+    text-align: center;
+}
+
+.card-header h3 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+/* --- CUERPO DEL FORMULARIO --- */
+.card-body {
+    padding: 40px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+/* --- ENTRADAS DE TEXTO --- */
+.form-control {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 15px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* --- BOTONES ACCIÓN --- */
+.form-actions {
+    display: flex;
+    flex-direction: column; /* Apilados para que se vean ordenados */
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 15px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+}
+
+.btn-save:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 25px rgba(99, 102, 241, 0.3);
+}
+
+.btn-cancel {
+    text-align: center;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 10px;
+    transition: color 0.2s;
+}
+
+.btn-cancel:hover {
+    color: var(--dark);
+    text-decoration: underline;
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Blog Personal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23a855f7;stop-opacity:1%22 /></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23grad)%22 /><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22>📓</text></svg>">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">Mi Blog Personal</a>
+            <a href="{{ url_for('blog.nuevo') }}" class="btn btn-outline-light">+ Escribir Post</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Mis Pensamientos</h1>
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100 card-post"> 
+                    <div class="card-body">
+                        <h2 class="card-title h5 post-title">{{ post.titulo }}</h2>
+                        <p class="card-text post-content">{{ post.contenido[:150] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{ post.fecha.strftime('%d/%m/%Y') }}</small>
+                            
+                            <div class="btn-group">
+                                <a href="{{ url_for('blog.editar', id=post.id) }}" 
+                                   class="btn btn-sm btn-outline-primary me-2">Editar</a>
+                                
+                                <a href="{{ url_for('blog.eliminar', id=post.id) }}" 
+                                   class="btn btn-sm btn-outline-danger" 
+                                   onclick="return confirm('¿Seguro que quieres borrarlo?')">Eliminar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center mt-5">
+                <div class="alert alert-info py-5 shadow-sm">
+                    <h4>No hay pensamientos guardados todavía</h4>
+                    <p>¡El lienzo está en blanco! Comienza escribiendo algo nuevo.</p>
+                    <a href="{{ url_for('blog.nuevo') }}" class="btn btn-primary mt-2">Crear mi primera nota</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
