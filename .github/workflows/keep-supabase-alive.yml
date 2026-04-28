@@ -1,0 +1,22 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Keep Supabase project active
+        run: |
+          echo "🔄 Consultando la base de datos para mantenerla activa..."
+          
+          curl -X GET "https://AQUI-PONES-TU-ID.supabase.co/rest/v1/posts?limit=1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          
+          echo ""
+          echo "✅ Consulta completada. Supabase seguirá activo."
