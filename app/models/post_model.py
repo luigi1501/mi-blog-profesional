@@ -1,3 +1,4 @@
+from datetime import datetime
 from .. import db
 
 class Post(db.Model):
@@ -5,4 +6,4 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(100), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
-    fecha = db.Column(db.DateTime, server_default=db.func.now())
+    fecha = db.Column(db.DateTime, default=datetime.utcnow, server_default=db.func.now())
