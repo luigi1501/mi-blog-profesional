@@ -4,19 +4,20 @@ from app.db import db
 
 class BlogController:
     @staticmethod
-    def crear_post(titulo, contenido):
-        nuevo_post = Post(titulo=titulo, contenido=contenido)
+    def crear_post(titulo, contenido, categoria='General'):
+        nuevo_post = Post(titulo=titulo, contenido=contenido, categoria=categoria or 'General')
         db.session.add(nuevo_post)
         db.session.commit()
 
     @staticmethod
-    def obtener_todos(query=None):
+    def obtener_todos(query=None, categoria=None):
+        q = Post.query
+        if categoria and categoria != 'Todas':
+            q = q.filter(Post.categoria == categoria)
         if query:
             search = f"%{query}%"
-            return Post.query.filter(
-                or_(Post.titulo.ilike(search), Post.contenido.ilike(search))
-            ).order_by(Post.fecha.desc()).all()
-        return Post.query.order_by(Post.fecha.desc()).all()
+            q = q.filter(or_(Post.titulo.ilike(search), Post.contenido.ilike(search)))
+        return q.order_by(Post.fecha.desc()).all()
 
     @staticmethod
     def eliminar_post(id):
@@ -30,11 +31,13 @@ class BlogController:
         return db.session.get(Post, id)
 
     @staticmethod
-    def actualizar_post(id, titulo, contenido):
+    def actualizar_post(id, titulo, contenido, categoria='General'):
         post = db.session.get(Post, id)
         if post:
             post.titulo = titulo
             post.contenido = contenido
+            if categoria:
+                post.categoria = categoria
             db.session.commit()
             return True
         return False

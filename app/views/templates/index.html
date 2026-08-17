@@ -45,16 +45,29 @@
         <h1 class="text-center mb-2">Mis Pensamientos</h1>
         
         <!-- Buscador -->
-        <div class="search-container mb-4">
+        <div class="search-container mb-3">
             <form action="{{ url_for('blog.index') }}" method="GET" class="search-form">
                 <input type="text" name="q" class="search-input" placeholder="🔍 Buscar por título o palabras clave..." value="{{ search_query or '' }}">
+                {% if selected_cat %}
+                    <input type="hidden" name="cat" value="{{ selected_cat }}">
+                {% endif %}
                 <button type="submit" class="btn-search">Buscar</button>
             </form>
             {% if search_query %}
                 <div class="text-center mt-2" style="font-size: 0.95rem;">
-                    Resultados para "<strong>{{ search_query }}</strong>" — <a href="{{ url_for('blog.index') }}" style="color: var(--primary);">Limpiar búsqueda</a>
+                    Resultados para "<strong>{{ search_query }}</strong>" — <a href="{{ url_for('blog.index', cat=selected_cat or '') }}" style="color: var(--primary);">Limpiar búsqueda</a>
                 </div>
             {% endif %}
+        </div>
+
+        <!-- Filtros por Categoría (Pills) -->
+        <div class="category-filter-bar">
+            <a href="{{ url_for('blog.index', q=search_query or '') }}" class="cat-pill {% if not selected_cat or selected_cat == 'Todas' %}active{% endif %}">Todas</a>
+            <a href="{{ url_for('blog.index', cat='General', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'General' %}active{% endif %}">💡 General</a>
+            <a href="{{ url_for('blog.index', cat='Tecnología', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Tecnología' %}active{% endif %}">💻 Tecnología</a>
+            <a href="{{ url_for('blog.index', cat='Proyectos', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Proyectos' %}active{% endif %}">🚀 Proyectos</a>
+            <a href="{{ url_for('blog.index', cat='Reflexiones', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Reflexiones' %}active{% endif %}">🧠 Reflexiones</a>
+            <a href="{{ url_for('blog.index', cat='Aprendizaje', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Aprendizaje' %}active{% endif %}">📚 Aprendizaje</a>
         </div>
 
         <div class="row">
@@ -62,11 +75,12 @@
             <div class="col-md-6 mb-4">
                 <div class="card shadow-sm h-100 card-post"> 
                     <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h2 class="card-title h5 post-title m-0">{{ post.titulo }}</h2>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="category-badge">{{ post.categoria or 'General' }}</span>
                             <span class="badge-reading-time">⏱️ {{ post.tiempo_lectura }} min</span>
                         </div>
-                        <p class="card-text post-content">{{ post.contenido[:150] }}{% if post.contenido|length > 150 %}...{% endif %}</p>
+                        <h2 class="card-title h5 post-title mb-2">{{ post.titulo }}</h2>
+                        <div class="card-text post-content mb-3">{{ post.contenido_html | safe }}</div>
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">{{ post.fecha.strftime('%d/%m/%Y') if post.fecha else '' }}</small>
                             

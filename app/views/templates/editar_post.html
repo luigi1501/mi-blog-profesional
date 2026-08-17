@@ -28,8 +28,19 @@
                         </div>
                         
                         <div class="mb-4">
-                            <label for="contenido" class="form-label fw-bold">¿Qué quieres cambiar?</label>
-                            <textarea name="contenido" id="contenido" rows="6" class="form-control" 
+                            <label for="categoria" class="form-label fw-bold">Categoría</label>
+                            <select name="categoria" id="categoria" class="form-control" required>
+                                <option value="General" {% if post.categoria == 'General' %}selected{% endif %}>💡 General</option>
+                                <option value="Tecnología" {% if post.categoria == 'Tecnología' %}selected{% endif %}>💻 Tecnología</option>
+                                <option value="Proyectos" {% if post.categoria == 'Proyectos' %}selected{% endif %}>🚀 Proyectos</option>
+                                <option value="Reflexiones" {% if post.categoria == 'Reflexiones' %}selected{% endif %}>🧠 Reflexiones</option>
+                                <option value="Aprendizaje" {% if post.categoria == 'Aprendizaje' %}selected{% endif %}>📚 Aprendizaje</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="contenido" class="form-label fw-bold">¿Qué quieres cambiar? (Soporta Markdown)</label>
+                            <textarea name="contenido" id="contenido" rows="8" class="form-control" 
                                       required>{{ post.contenido }}</textarea>
                         </div>
 

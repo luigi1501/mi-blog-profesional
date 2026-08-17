@@ -7,8 +7,9 @@ blog_bp = Blueprint('blog', __name__)
 @blog_bp.route('/')
 def index():
     query = request.args.get('q', '').strip()
-    posts = BlogController.obtener_todos(query=query if query else None)
-    return render_template('index.html', posts=posts, search_query=query)
+    categoria = request.args.get('cat', '').strip()
+    posts = BlogController.obtener_todos(query=query if query else None, categoria=categoria if categoria else None)
+    return render_template('index.html', posts=posts, search_query=query, selected_cat=categoria)
 
 @blog_bp.route('/nuevo', methods=['GET', 'POST'])
 @login_required
@@ -16,7 +17,8 @@ def nuevo():
     if request.method == 'POST':
         titulo = request.form.get('titulo')
         contenido = request.form.get('contenido')
-        BlogController.crear_post(titulo, contenido)
+        categoria = request.form.get('categoria', 'General')
+        BlogController.crear_post(titulo, contenido, categoria)
         return redirect(url_for('blog.index'))
     return render_template('nuevo_post.html')
 
@@ -34,7 +36,8 @@ def editar(id):
     if request.method == 'POST':
         titulo = request.form.get('titulo')
         contenido = request.form.get('contenido')
-        BlogController.actualizar_post(id, titulo, contenido)
+        categoria = request.form.get('categoria', 'General')
+        BlogController.actualizar_post(id, titulo, contenido, categoria)
         return redirect(url_for('blog.index'))
     
     return render_template('editar_post.html', post=post)
