@@ -163,11 +163,42 @@
             `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
 
         document.getElementById('copyLinkBtn').addEventListener('click', () => {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                const btn = document.getElementById('copyLinkBtn');
+            const url = window.location.href;
+            const btn = document.getElementById('copyLinkBtn');
+
+            const showSuccess = () => {
                 btn.textContent = '✅ ¡Copiado!';
-                setTimeout(() => btn.textContent = '🔗 Copiar link', 2000);
-            });
+                btn.style.background = '#10b981';
+                btn.style.color = 'white';
+                btn.style.borderColor = '#10b981';
+                setTimeout(() => {
+                    btn.textContent = '🔗 Copiar link';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2500);
+            };
+
+            // Intenta API moderna (solo HTTPS), si falla usa fallback
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(showSuccess);
+            } else {
+                // Fallback para HTTP (localhost)
+                const ta = document.createElement('textarea');
+                ta.value = url;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    showSuccess();
+                } catch (e) {
+                    btn.textContent = '❌ No se pudo copiar';
+                }
+                document.body.removeChild(ta);
+            }
         });
 
         // ── Reading progress bar ──
