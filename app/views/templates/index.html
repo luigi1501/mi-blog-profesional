@@ -3,159 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Blog Personal</title>
+    <title>Mi Blog Personal — Pensamientos & Ideas</title>
+    <meta name="description" content="Un espacio personal para compartir pensamientos, ideas y aprendizajes sobre tecnología, proyectos y más.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23a855f7;stop-opacity:1%22 /></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23grad)%22 /><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22>📓</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23a855f7;stop-opacity:1%22 /></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23grad)%22 /><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22>✦</text></svg>">
     <script>
         (function() {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark-theme');
+                document.documentElement.style.colorScheme = 'dark';
             }
         })();
     </script>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="/">Mi Blog Personal</a>
-            <div class="d-flex align-items-center gap-3">
-                <button id="themeToggleBtn" class="theme-toggle-btn" title="Cambiar tema">🌙</button>
+<body>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <span class="brand-dot"></span>
+                Mi Blog Personal
+            </a>
+            <div class="navbar-actions">
+                <button id="themeToggleBtn" class="theme-toggle-btn" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('blog.nuevo') }}" class="btn btn-outline-light me-2">+ Escribir Post</a>
-                    <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger">Cerrar Sesión ({{ current_user.username }})</a>
+                    <a href="{{ url_for('blog.nuevo') }}" class="btn-nav-write">
+                        <span>+ Escribir Post</span>
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn-nav-logout">
+                        Salir
+                    </a>
                 {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-light">🔒 Iniciar Sesión</a>
+                    <a href="{{ url_for('auth.login') }}" class="btn-nav-login">🔒 Admin</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
+    <!-- ===== HERO ===== -->
+    <section class="hero-section">
+        <h1>Mis Pensamientos</h1>
+        <p class="hero-subtitle">Ideas, aprendizajes y reflexiones sobre tecnología y desarrollo</p>
+    </section>
+
     <div class="container">
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} mb-4" style="padding: 12px 20px; border-radius: 8px; background: #e0f2fe; color: #0369a1;">
-                {{ message }}
-              </div>
-            {% endfor %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
           {% endif %}
         {% endwith %}
 
-        <h1 class="text-center mb-2">Mis Pensamientos</h1>
-        
-        <!-- Buscador -->
-        <div class="search-container mb-3">
+        <!-- Search -->
+        <div class="search-wrapper">
             <form action="{{ url_for('blog.index') }}" method="GET" class="search-form">
-                <input type="text" name="q" class="search-input" placeholder="🔍 Buscar por título o palabras clave..." value="{{ search_query or '' }}">
+                <input type="text" id="searchInput" name="q" class="search-input"
+                       placeholder="🔍 Buscar por título o palabras clave..."
+                       value="{{ search_query or '' }}" autocomplete="off">
                 {% if selected_cat %}
                     <input type="hidden" name="cat" value="{{ selected_cat }}">
                 {% endif %}
                 <button type="submit" class="btn-search">Buscar</button>
             </form>
             {% if search_query %}
-                <div class="text-center mt-2" style="font-size: 0.95rem;">
-                    Resultados para "<strong>{{ search_query }}</strong>" — <a href="{{ url_for('blog.index', cat=selected_cat or '') }}" style="color: var(--primary);">Limpiar búsqueda</a>
-                </div>
+                <p class="search-result-info">
+                    Resultados para "<strong>{{ search_query }}</strong>" —
+                    <a href="{{ url_for('blog.index', cat=selected_cat or '') }}">Limpiar</a>
+                </p>
             {% endif %}
         </div>
 
-        <!-- Filtros por Categoría (Pills) -->
+        <!-- Category Pills -->
         <div class="category-filter-bar">
-            <a href="{{ url_for('blog.index', q=search_query or '') }}" class="cat-pill {% if not selected_cat or selected_cat == 'Todas' %}active{% endif %}">Todas</a>
-            <a href="{{ url_for('blog.index', cat='General', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'General' %}active{% endif %}">💡 General</a>
-            <a href="{{ url_for('blog.index', cat='Tecnología', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Tecnología' %}active{% endif %}">💻 Tecnología</a>
-            <a href="{{ url_for('blog.index', cat='Proyectos', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Proyectos' %}active{% endif %}">🚀 Proyectos</a>
-            <a href="{{ url_for('blog.index', cat='Reflexiones', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Reflexiones' %}active{% endif %}">🧠 Reflexiones</a>
-            <a href="{{ url_for('blog.index', cat='Aprendizaje', q=search_query or '') }}" class="cat-pill {% if selected_cat == 'Aprendizaje' %}active{% endif %}">📚 Aprendizaje</a>
+            <a href="{{ url_for('blog.index', q=search_query or '') }}" 
+               class="cat-pill {% if not selected_cat or selected_cat == 'Todas' %}active{% endif %}">✦ Todas</a>
+            <a href="{{ url_for('blog.index', cat='General', q=search_query or '') }}" 
+               class="cat-pill {% if selected_cat == 'General' %}active{% endif %}">💡 General</a>
+            <a href="{{ url_for('blog.index', cat='Tecnología', q=search_query or '') }}" 
+               class="cat-pill {% if selected_cat == 'Tecnología' %}active{% endif %}">💻 Tecnología</a>
+            <a href="{{ url_for('blog.index', cat='Proyectos', q=search_query or '') }}" 
+               class="cat-pill {% if selected_cat == 'Proyectos' %}active{% endif %}">🚀 Proyectos</a>
+            <a href="{{ url_for('blog.index', cat='Reflexiones', q=search_query or '') }}" 
+               class="cat-pill {% if selected_cat == 'Reflexiones' %}active{% endif %}">🧠 Reflexiones</a>
+            <a href="{{ url_for('blog.index', cat='Aprendizaje', q=search_query or '') }}" 
+               class="cat-pill {% if selected_cat == 'Aprendizaje' %}active{% endif %}">📚 Aprendizaje</a>
         </div>
 
-        <div class="row">
+        <!-- Posts Grid -->
+        <div class="posts-grid" id="postsGrid">
             {% for post in posts %}
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100 card-post"> 
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="category-badge">{{ post.categoria or 'General' }}</span>
-                            <span class="badge-reading-time">⏱️ {{ post.tiempo_lectura }} min</span>
-                        </div>
-                        <h2 class="card-title h5 post-title mb-2">{{ post.titulo }}</h2>
-                        <div class="card-text post-content mb-3">{{ post.contenido_html | safe }}</div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">{{ post.fecha.strftime('%d/%m/%Y') if post.fecha else '' }}</small>
-                            
-                            {% if current_user.is_authenticated %}
-                            <div class="btn-group">
-                                <a href="{{ url_for('blog.editar', id=post.id) }}" 
-                                   class="btn btn-sm btn-outline-primary me-2">Editar</a>
-                                
-                                <a href="{{ url_for('blog.eliminar', id=post.id) }}" 
-                                   class="btn btn-sm btn-outline-danger" 
-                                   onclick="return confirm('¿Seguro que quieres borrarlo?')">Eliminar</a>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+            <article class="post-card" data-title="{{ post.titulo | lower }}" data-content="{{ post.contenido | lower }}">
+                <div class="card-meta">
+                    <span class="category-badge">{{ post.categoria or 'General' }}</span>
+                    <span class="badge-reading-time">⏱ {{ post.tiempo_lectura }} min</span>
                 </div>
-            </div>
-            {% else %}
-            <div class="col-12 text-center mt-5">
-                <div class="alert alert-info py-5 shadow-sm">
-                    {% if search_query %}
-                        <h4>No se encontraron publicaciones</h4>
-                        <p>No se encontraron resultados para "{{ search_query }}". Pruebas con otras palabras.</p>
-                        <a href="{{ url_for('blog.index') }}" class="btn btn-primary mt-2">Ver todas las publicaciones</a>
-                    {% else %}
-                        <h4>No hay pensamientos guardados todavía</h4>
-                        <p>¡El lienzo está en blanco! Comienza escribiendo algo nuevo.</p>
-                        {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('blog.nuevo') }}" class="btn btn-primary mt-2">Crear mi primera nota</a>
-                        {% endif %}
+
+                <h2 class="post-title">{{ post.titulo }}</h2>
+
+                <div class="post-content post-content-preview">
+                    {{ post.contenido_html | safe }}
+                </div>
+
+                <div class="card-footer-row">
+                    <span class="post-date">
+                        📅 {{ post.fecha.strftime('%d %b %Y') if post.fecha else '' }}
+                    </span>
+                    {% if current_user.is_authenticated %}
+                    <div class="btn-group">
+                        <a href="{{ url_for('blog.editar', id=post.id) }}" class="btn btn-edit">✏️ Editar</a>
+                        <a href="{{ url_for('blog.eliminar', id=post.id) }}"
+                           class="btn btn-delete"
+                           onclick="return confirm('¿Seguro que quieres eliminar este post?')">🗑 Eliminar</a>
+                    </div>
                     {% endif %}
                 </div>
+            </article>
+            {% else %}
+            <div class="empty-state">
+                <span class="empty-state-icon">✦</span>
+                {% if search_query %}
+                    <h3>Sin resultados para "{{ search_query }}"</h3>
+                    <p>Prueba con otras palabras clave o navega por categorías.</p>
+                    <a href="{{ url_for('blog.index') }}" class="btn-primary-cta">Ver todos los posts</a>
+                {% elif selected_cat %}
+                    <h3>Aún no hay posts en esta categoría</h3>
+                    <p>¡Sé el primero en escribir sobre {{ selected_cat }}!</p>
+                    <a href="{{ url_for('blog.index') }}" class="btn-primary-cta">Ver todos los posts</a>
+                {% else %}
+                    <h3>El lienzo está en blanco</h3>
+                    <p>Aquí aparecerán tus pensamientos e ideas. ¡Comienza escribiendo!</p>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('blog.nuevo') }}" class="btn-primary-cta">✍️ Crear primer post</a>
+                    {% endif %}
+                {% endif %}
             </div>
             {% endfor %}
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>Hecho con ❤️ — Mi Blog Personal &copy; {{ 2025 }}</p>
+    </footer>
+
     <script>
-        const toggleBtn = document.getElementById('themeToggleBtn');
-        const updateIcon = () => {
-            const isDark = document.documentElement.classList.contains('dark-theme');
-            toggleBtn.textContent = isDark ? '☀️' : '🌙';
+        // ── Theme Toggle ──
+        const themeBtn  = document.getElementById('themeToggleBtn');
+        const html      = document.documentElement;
+
+        const applyTheme = (dark) => {
+            html.classList.toggle('dark-theme', dark);
+            document.body.classList.toggle('dark-theme', dark);
+            html.style.colorScheme = dark ? 'dark' : 'light';
+            themeBtn.textContent = dark ? '☀️' : '🌙';
         };
 
-        if (document.documentElement.classList.contains('dark-theme')) {
-            document.body.classList.add('dark-theme');
-        }
-        updateIcon();
+        // Sync body on load
+        applyTheme(html.classList.contains('dark-theme'));
 
-        toggleBtn.addEventListener('click', () => {
-            const isDark = document.body.classList.toggle('dark-theme');
-            document.documentElement.classList.toggle('dark-theme', isDark);
+        themeBtn.addEventListener('click', () => {
+            const isDark = !html.classList.contains('dark-theme');
+            applyTheme(isDark);
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            updateIcon();
         });
 
-        // Buscador instantáneo en tiempo real (mientras escribes)
-        const searchInput = document.querySelector('.search-input');
+        // ── Instant Search (client-side while typing) ──
+        const searchInput = document.getElementById('searchInput');
         if (searchInput) {
-            searchInput.addEventListener('input', function(e) {
-                const term = e.target.value.toLowerCase().trim();
-                const cards = document.querySelectorAll('.card-post');
-                let foundAny = false;
-
-                cards.forEach(card => {
-                    const title = card.querySelector('.post-title').textContent.toLowerCase();
-                    const content = card.querySelector('.post-content').textContent.toLowerCase();
-                    const container = card.closest('.col-md-6');
-                    
-                    if (title.includes(term) || content.includes(term)) {
-                        container.style.display = '';
-                        foundAny = true;
-                    } else {
-                        container.style.display = 'none';
-                    }
+            searchInput.addEventListener('input', function () {
+                const term = this.value.toLowerCase().trim();
+                document.querySelectorAll('.post-card').forEach(card => {
+                    const title   = card.dataset.title   || '';
+                    const content = card.dataset.content || '';
+                    card.style.display = (!term || title.includes(term) || content.includes(term)) ? '' : 'none';
                 });
             });
         }

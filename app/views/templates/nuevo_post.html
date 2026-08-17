@@ -3,27 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuevo Post</title>
+    <title>Nuevo Post — Mi Blog Personal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='form_style.css') }}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23a855f7;stop-opacity:1%22 /></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23grad)%22 /><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22>📓</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1%22/><stop offset=%22100%25%22 style=%22stop-color:%23a855f7%22/></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23g)%22/><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22>✍️</text></svg>">
 </head>
 <body>
-    <div class="container">
-        <div class="card shadow-lg">
-            <div class="card-header">
-                <h3>📝 Crear Publicación</h3>
+    <a href="{{ url_for('blog.index') }}" class="back-link">← Volver al blog</a>
+
+    <div class="form-wrapper">
+        <div class="form-card">
+            <div class="form-card-header">
+                <span class="header-icon">✍️</span>
+                <h1>Crear Nueva Publicación</h1>
+                <p class="header-subtitle">Comparte tus pensamientos con el mundo</p>
             </div>
-            <div class="card-body p-4">
+
+            <div class="form-card-body">
                 <form action="{{ url_for('blog.nuevo') }}" method="POST">
-                    <div class="mb-4 text-start">
-                        <label class="form-label">Título del Pensamiento</label>
-                        <input type="text" name="titulo" class="form-control" 
-                               placeholder="¿De qué trata hoy?" required>
+                    <div class="form-group">
+                        <label class="form-label" for="titulo">Título</label>
+                        <input type="text" id="titulo" name="titulo" class="form-control"
+                               placeholder="¿De qué trata este post?" required autofocus>
                     </div>
 
-                    <div class="mb-4 text-start">
-                        <label class="form-label">Categoría</label>
-                        <select name="categoria" class="form-control" required>
+                    <div class="form-group">
+                        <label class="form-label" for="categoria">Categoría</label>
+                        <select id="categoria" name="categoria" class="form-control" required>
                             <option value="General">💡 General</option>
                             <option value="Tecnología">💻 Tecnología</option>
                             <option value="Proyectos">🚀 Proyectos</option>
@@ -32,15 +40,28 @@
                         </select>
                     </div>
 
-                    <div class="mb-4 text-start">
-                        <label class="form-label">Contenido (Soporta formato Markdown)</label>
-                        <textarea name="contenido" class="form-control" rows="8" 
-                                  placeholder="Escribe aquí tus ideas (puedes usar Markdown como **negrita**, - listas o ```código```)..." required></textarea>
+                    <div class="form-group">
+                        <label class="form-label" for="contenido">
+                            Contenido
+                            <span class="optional">— soporta Markdown</span>
+                        </label>
+                        <textarea id="contenido" name="contenido" class="form-control"
+                                  rows="10" placeholder="Escribe aquí tus ideas..." required></textarea>
+                        <div class="markdown-hint">
+                            💡 Puedes usar:
+                            <code>**negrita**</code>
+                            <code>*cursiva*</code>
+                            <code>- listas</code>
+                            <code>> citas</code>
+                            <code>```código```</code>
+                        </div>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn-save">Guardar Post</button>
-                        <a href="{{ url_for('blog.index') }}" class="btn-cancel">Cancelar y volver</a>
+                    <div class="form-divider"></div>
+
+                    <div class="actions-row">
+                        <a href="{{ url_for('blog.index') }}" class="btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn-submit">Publicar Post ✦</button>
                     </div>
                 </form>
             </div>
