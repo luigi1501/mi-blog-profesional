@@ -59,6 +59,12 @@ def create_app():
         
         try:
             db.create_all()
+            try:
+                db.session.execute(db.text("ALTER TABLE posts ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'General';"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+
             # Crear usuario admin por defecto si no existe ningún usuario
             if not User.query.first():
                 admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
