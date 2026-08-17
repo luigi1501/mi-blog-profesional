@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Mi Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='form_style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22grad%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23a855f7;stop-opacity:1%22 /></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23grad)%22 /><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22serif%22>🔒</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h3>🔒 Iniciar Sesión de Administrador</h3>
+            </div>
+            <div class="card-body p-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }}" style="color: #ef4444; background: #fee2e2; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('auth.login', next=request.args.get('next', '')) }}" method="POST">
+                    <div class="mb-4 text-start">
+                        <label class="form-label">Usuario</label>
+                        <input type="text" name="username" class="form-control" 
+                               placeholder="Ingresa tu usuario" required autofocus>
+                    </div>
+
+                    <div class="mb-4 text-start">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="password" class="form-control" 
+                               placeholder="Ingresa tu contraseña" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save">Ingresar</button>
+                        <a href="{{ url_for('blog.index') }}" class="btn-cancel">Volver al inicio</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

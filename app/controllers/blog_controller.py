@@ -1,4 +1,4 @@
-# app/controllers/blog_controller.py
+from sqlalchemy import or_
 from app.models.post_model import Post
 from app.db import db 
 
@@ -10,7 +10,12 @@ class BlogController:
         db.session.commit()
 
     @staticmethod
-    def obtener_todos():
+    def obtener_todos(query=None):
+        if query:
+            search = f"%{query}%"
+            return Post.query.filter(
+                or_(Post.titulo.ilike(search), Post.contenido.ilike(search))
+            ).order_by(Post.fecha.desc()).all()
         return Post.query.order_by(Post.fecha.desc()).all()
 
     @staticmethod
