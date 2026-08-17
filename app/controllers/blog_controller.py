@@ -31,6 +31,14 @@ class BlogController:
         return db.session.get(Post, id)
 
     @staticmethod
+    def incrementar_visitas(id):
+        post = db.session.get(Post, id)
+        if post:
+            post.visitas = (post.visitas or 0) + 1
+            db.session.commit()
+        return post
+
+    @staticmethod
     def actualizar_post(id, titulo, contenido, categoria='General'):
         post = db.session.get(Post, id)
         if post:

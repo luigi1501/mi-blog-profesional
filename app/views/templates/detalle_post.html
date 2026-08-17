@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.titulo }} — Mi Blog Personal</title>
+    <meta name="description" content="{{ post.resumen }}">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type"        content="article">
+    <meta property="og:title"       content="{{ post.titulo }}">
+    <meta property="og:description" content="{{ post.resumen }}">
+    <meta property="og:url"         content="{{ request.url }}">
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="{{ post.titulo }}">
+    <meta name="twitter:description" content="{{ post.resumen }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='detalle.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 style=%22stop-color:%236366f1%22/><stop offset=%22100%25%22 style=%22stop-color:%23a855f7%22/></linearGradient><circle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22url(%23g)%22/><text y=%22.9em%22 x=%2250%22 font-size=%2270%22 text-anchor=%22middle%22 fill=%22white%22>✦</text></svg>">
+    <script>
+        (function() {
+            const t = localStorage.getItem('theme');
+            if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark-theme');
+                document.documentElement.style.colorScheme = 'dark';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Reading Progress Bar -->
+    <div class="reading-progress" id="readingBar"></div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('blog.index') }}">
+                <span class="brand-dot"></span>
+                Mi Blog Personal
+            </a>
+            <div class="navbar-actions">
+                <button id="themeToggleBtn" class="theme-toggle-btn" title="Cambiar tema">🌙</button>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('blog.editar', id=post.id) }}" class="btn-nav-write">✏️ Editar</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn-nav-logout">Salir</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== ARTICLE ===== -->
+    <main class="detalle-main">
+        <div class="detalle-container">
+
+            <!-- Back link -->
+            <a href="{{ url_for('blog.index') }}" class="detalle-back">
+                ← Volver al blog
+            </a>
+
+            <!-- Article card -->
+            <article class="detalle-card">
+
+                <!-- Category + meta row -->
+                <div class="detalle-meta-row">
+                    <span class="category-badge">{{ post.categoria or 'General' }}</span>
+                    <div class="detalle-badges">
+                        <span class="badge-reading-time">⏱ {{ post.tiempo_lectura }} min de lectura</span>
+                        <span class="badge-visitas">👁 {{ post.visitas or 0 }} {{ 'vista' if (post.visitas or 0) == 1 else 'vistas' }}</span>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <h1 class="detalle-title">{{ post.titulo }}</h1>
+
+                <!-- Date -->
+                <p class="detalle-date">
+                    📅 Publicado el {{ post.fecha.strftime('%d de %B de %Y') if post.fecha else '' }}
+                </p>
+
+                <!-- Divider -->
+                <hr class="detalle-divider">
+
+                <!-- Content (full Markdown rendered) -->
+                <div class="detalle-content post-content">
+                    {{ post.contenido_html | safe }}
+                </div>
+
+                <!-- Share + Admin actions -->
+                <div class="detalle-actions">
+                    <div class="share-section">
+                        <p class="share-label">Compartir</p>
+                        <div class="share-buttons">
+                            <a id="shareTwitter" href="#" target="_blank" rel="noopener" class="share-btn share-twitter">
+                                𝕏 Twitter
+                            </a>
+                            <a id="shareLinkedIn" href="#" target="_blank" rel="noopener" class="share-btn share-linkedin">
+                                in LinkedIn
+                            </a>
+                            <button id="copyLinkBtn" class="share-btn share-copy">
+                                🔗 Copiar link
+                            </button>
+                        </div>
+                    </div>
+
+                    {% if current_user.is_authenticated %}
+                    <div class="admin-actions">
+                        <a href="{{ url_for('blog.editar', id=post.id) }}" class="btn-admin-edit">✏️ Editar</a>
+                        <a href="{{ url_for('blog.eliminar', id=post.id) }}"
+                           class="btn-admin-delete"
+                           onclick="return confirm('¿Eliminar este post permanentemente?')">🗑 Eliminar</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+
+            <!-- Related: back to more posts -->
+            <div class="detalle-footer-nav">
+                <a href="{{ url_for('blog.index') }}" class="btn-primary-cta">← Ver más posts</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('blog.nuevo') }}" class="btn-nav-write" style="text-decoration:none;">+ Nuevo Post</a>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>Hecho con ❤️ — Mi Blog Personal &copy; 2025</p>
+    </footer>
+
+    <script>
+        // ── Theme Toggle ──
+        const themeBtn = document.getElementById('themeToggleBtn');
+        const html = document.documentElement;
+
+        const applyTheme = (dark) => {
+            html.classList.toggle('dark-theme', dark);
+            document.body.classList.toggle('dark-theme', dark);
+            html.style.colorScheme = dark ? 'dark' : 'light';
+            themeBtn.textContent = dark ? '☀️' : '🌙';
+        };
+
+        applyTheme(html.classList.contains('dark-theme'));
+
+        themeBtn.addEventListener('click', () => {
+            const isDark = !html.classList.contains('dark-theme');
+            applyTheme(isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // ── Share Buttons ──
+        const pageUrl   = encodeURIComponent(window.location.href);
+        const pageTitle = encodeURIComponent(document.title);
+
+        document.getElementById('shareTwitter').href =
+            `https://twitter.com/intent/tweet?text=${pageTitle}&url=${pageUrl}`;
+
+        document.getElementById('shareLinkedIn').href =
+            `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
+
+        document.getElementById('copyLinkBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const btn = document.getElementById('copyLinkBtn');
+                btn.textContent = '✅ ¡Copiado!';
+                setTimeout(() => btn.textContent = '🔗 Copiar link', 2000);
+            });
+        });
+
+        // ── Reading progress bar ──
+        const bar = document.getElementById('readingBar');
+        if (bar) {
+            window.addEventListener('scroll', () => {
+                const docHeight  = document.body.scrollHeight - window.innerHeight;
+                const scrolled   = window.scrollY;
+                bar.style.width  = (docHeight > 0 ? (scrolled / docHeight) * 100 : 0) + '%';
+            });
+        }
+    </script>
+</body>
+</html>

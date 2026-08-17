@@ -1,8 +1,16 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from flask_login import login_required
+from flask import Blueprint, render_template, request, redirect, url_for, abort
+from flask_login import login_required, current_user
 from app.controllers.blog_controller import BlogController
 
 blog_bp = Blueprint('blog', __name__)
+
+@blog_bp.route('/post/<int:id>')
+def detalle(id):
+    post = BlogController.incrementar_visitas(id)
+    if not post:
+        abort(404)
+    return render_template('detalle_post.html', post=post)
+
 
 @blog_bp.route('/')
 def index():

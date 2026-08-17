@@ -61,6 +61,8 @@ def create_app():
             db.create_all()
             try:
                 db.session.execute(db.text("ALTER TABLE posts ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) DEFAULT 'General';"))
+                db.session.execute(db.text("ALTER TABLE posts ADD COLUMN IF NOT EXISTS visitas INTEGER DEFAULT 0;"))
+                db.session.execute(db.text("UPDATE posts SET visitas = 0 WHERE visitas IS NULL;"))
                 db.session.commit()
             except Exception:
                 db.session.rollback()
