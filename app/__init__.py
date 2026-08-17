@@ -17,7 +17,10 @@ def create_app():
                 template_folder=template_dir, 
                 static_folder=static_dir)
     
-    app.secret_key = os.environ.get('SECRET_KEY', 'mi_clave_secreta_blog_2026')
+    secret_key = os.environ.get('SECRET_KEY')
+    if not secret_key:
+        raise RuntimeError("❌ SECRET_KEY no está definida. Agrégala a tu archivo .env o a las variables de Vercel.")
+    app.secret_key = secret_key
     
     db_uri = os.environ.get('DATABASE_URL')
     
@@ -69,12 +72,14 @@ def create_app():
 
             # Crear usuario admin por defecto si no existe ningún usuario
             if not User.query.first():
-                admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
+                admin_pass = os.environ.get('ADMIN_PASSWORD')
+                if not admin_pass:
+                    raise RuntimeError("❌ ADMIN_PASSWORD no está definida. Agrégala a tu .env o variables de Vercel.")
                 admin_user = User(username='admin')
                 admin_user.set_password(admin_pass)
                 db.session.add(admin_user)
                 db.session.commit()
-                app.logger.info("Usuario admin creado por defecto.")
+                app.logger.info("✅ Usuario admin creado con contraseña segura desde ADMIN_PASSWORD.")
         except Exception as e:
             app.logger.error(f"Error durante la inicialización de DB: {e}")
         
