@@ -1,8 +1,26 @@
-from flask import Blueprint, render_template, request, redirect, url_for, abort
+from flask import Blueprint, render_template, request, redirect, url_for, abort, jsonify
 from flask_login import login_required, current_user
+from sqlalchemy import text
 from app.controllers.blog_controller import BlogController
+from app.db import db
 
 blog_bp = Blueprint('blog', __name__)
+
+@blog_bp.route('/api/keep-alive', methods=['GET'])
+def keep_alive():
+    try:
+        db.session.execute(text("SELECT 1"))
+        return jsonify({
+            "status": "ok",
+            "message": "Supabase database ping successful",
+            "active": True
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e),
+            "active": False
+        }), 500
 
 @blog_bp.route('/post/<int:id>')
 def detalle(id):
@@ -48,4 +66,4 @@ def editar(id):
         BlogController.actualizar_post(id, titulo, contenido, categoria)
         return redirect(url_for('blog.index'))
     
-    return render_template('editar_post.html', post=post)
+    return render_template('editar_post.html', post=post)

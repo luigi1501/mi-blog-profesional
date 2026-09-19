@@ -1,0 +1,47 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Runs every 3 days at 00:00 UTC
+    - cron: '0 0 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    name: Ping Supabase REST API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Ping Request to Supabase API
+        run: |
+          echo "🔄 Enviando petición Keep-Alive a Supabase..."
+
+          SUPABASE_URL="${{ secrets.SUPABASE_URL }}"
+          SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "❌ Error: Las variables de entorno SUPABASE_URL o SUPABASE_ANON_KEY no están configuradas en los Secrets del repositorio."
+            exit 1
+          fi
+
+          RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X GET "${SUPABASE_URL}/rest/v1/posts?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+
+          echo "Código de respuesta HTTP: $RESPONSE_CODE"
+
+          if [ "$RESPONSE_CODE" -ge 200 ] && [ "$RESPONSE_CODE" -lt 300 ]; then
+            echo "✅ Consulta completada con éxito. La base de datos de Supabase continuará activa."
+          else
+            echo "⚠️ Advertencia: La API respondió con el código de estado $RESPONSE_CODE"
+            FALLBACK_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X GET "${SUPABASE_URL}/rest/v1/" \
+              -H "apikey: ${SUPABASE_ANON_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+            echo "Código de respuesta en endpoint raíz de la REST API: $FALLBACK_CODE"
+            if [ "$FALLBACK_CODE" -ge 200 ] && [ "$FALLBACK_CODE" -lt 400 ]; then
+              echo "✅ Fallback exitoso. Supabase continuará activo."
+            else
+              echo "❌ Error en el ping a Supabase."
+              exit 1
+            fi
+          fi
