@@ -1,7 +1,7 @@
 import urllib.request
 import sys
 
-url = "https://xtribcsicgyzjyhvsia.supabase.co/rest/v1/"
+url = "https://xtribcbsicgyzjyhvsia.supabase.co/rest/v1/"
 headers = {
     "apikey": "sb_publishable_qr4QprFfqrtklogBhez-Lw_hT9VRAID",
     "Authorization": "Bearer sb_publishable_qr4QprFfqrtklogBhez-Lw_hT9VRAID",
