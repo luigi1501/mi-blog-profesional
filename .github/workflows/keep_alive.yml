@@ -9,9 +9,13 @@ jobs:
   ping-database:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
-        run: |
-          echo "🔄 Ping a Supabase REST API..."
-          curl -f -s -i "https://xtribcsicgyzjyhvsia.supabase.co/rest/v1/" \
-            -H "apikey: sb_publishable_qr4QprFfqrtklogBhez-Lw_hT9VRAID" \
-            -H "Authorization: Bearer sb_publishable_qr4QprFfqrtklogBhez-Lw_hT9VRAID"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Python Ping Script
+        run: python .github/scripts/ping.py
