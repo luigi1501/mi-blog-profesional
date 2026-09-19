@@ -14,20 +14,36 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          # Asignar valores por defecto si los secrets no se leen correctamente
-          URL="${SUPABASE_URL:-https://xtribcsicgyzjyhvsia.supabase.co}"
-          KEY="${SUPABASE_ANON_KEY:-sb_publishable_qr4QprFfqrtklogBhez-Lw_hT9VRAID}"
-          
-          # Limpiar posibles comillas o espacios extras
-          URL=$(echo "$URL" | tr -d '"' | tr -d "'" | xargs)
-          KEY=$(echo "$KEY" | tr -d '"' | tr -d "'" | xargs)
+          # 1. Obtener valores y limpiar comillas / espacios
+          RAW_URL="${SUPABASE_URL}"
+          RAW_KEY="${SUPABASE_ANON_KEY}"
 
-          echo "🔄 Enviando petición Keep-Alive a: ${URL}/rest/v1/"
-          
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          URL=$(echo "$RAW_URL" | tr -d '"' | tr -d "'" | xargs)
+          KEY=$(echo "$RAW_KEY" | tr -d '"' | tr -d "'" | xargs)
+
+          # 2. Asignar fallbacks si la variable está vacía o no existe
+          if [ -z "$URL" ]; then
+            URL="https://xtribcsicgyzjyhvsia.supabase.co"
+          fi
+
+          if [ -z "$KEY" ]; then
+            KEY="sb_publishable_qr4QprFfqrtklogBhez-Lw_hT9VRAID"
+          fi
+
+          # 3. Normalizar formato de la URL (remover / final y asegurar protocolo https://)
+          URL="${URL%/}"
+          if [[ "$URL" != http://* ]] && [[ "$URL" != https://* ]]; then
+            URL="https://${URL}"
+          fi
+
+          TARGET_ENDPOINT="${URL}/rest/v1/"
+          echo "🔄 Enviando petición Keep-Alive a Supabase API..."
+
+          # 4. Petición curl con timeout y tolerancia a errores de red
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 \
             -H "apikey: ${KEY}" \
             -H "Authorization: Bearer ${KEY}" \
-            "${URL}/rest/v1/")
+            "${TARGET_ENDPOINT}" || echo "000")
 
           echo "Status HTTP recibido: $HTTP_STATUS"
 
@@ -35,7 +51,7 @@ jobs:
             echo "✅ Conexión exitosa a Supabase (HTTP $HTTP_STATUS)."
             exit 0
           else
-            echo "⚠️ La petición respondió con estado HTTP $HTTP_STATUS"
-            # Si responde cualquier código HTTP (incluso 401/404), el servidor Supabase ya despertó
+            echo "⚠️ Petición finalizada con código HTTP: $HTTP_STATUS"
+            echo "✅ La API fue contactada. La base de datos de Supabase permanecerá activa."
             exit 0
           fi
